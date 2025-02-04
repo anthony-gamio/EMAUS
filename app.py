@@ -6,7 +6,7 @@ app = Flask(__name__)
 # Cargar el archivo CSV
 def cargar_inventario():
     try:
-        df = pd.read_csv('inventario.csv', encoding='utf-8', encoding_errors='replace')
+        df = pd.read_csv('inventario.csv', encoding='utf-8')
         df['cantidad'] = df['cantidad'].astype(int)
         return df.set_index('nombre').to_dict(orient='index')
     except FileNotFoundError:
@@ -17,7 +17,7 @@ def guardar_inventario():
     df = pd.DataFrame.from_dict(inventario, orient='index')
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'nombre'}, inplace=True)
-    df.to_csv('inventario.csv', index=False)
+    df.to_csv('inventario.csv', index=False, encoding='utf-8')
 
 inventario = cargar_inventario()
 
