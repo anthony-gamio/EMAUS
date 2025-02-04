@@ -1,110 +1,97 @@
 nombre,cantidad,categoria
 HERVIDORES,7,Activo
 THERMOS,7,Activo
-POLO_BLANCO_S,2,Consumible
-POLO_CON_ROSA_S,3,Consumible
-POLO_AZUL_S,3,Consumible
-POLO_BLANCO_M,0,Consumible
-POLO_CON_ROSA_M,0,Consumible
-POLO_AZUL_M,1,Consumible
-POLO_BLANCO_L,3,Consumible
-POLO_CON_ROSA_L,10,Consumible
-POLO_AZUL_L,7,Consumible
-POLO_BLANCO_XL,3,Consumible
-POLO_CON_ROSA_XL,11,Consumible
-POLO_AZUL_XL,3,Consumible
-POLO_BLANCO_XXL,2,Consumible
-POLO_CON_ROSA_XXL,2,Consumible
-POLO_AZUL_XXL,2,Consumible
+POLO BLANCO S,2,Consumible
+POLO AZUL XXL,2,Consumible
 SERVILLETAS,2000,Consumible
-VASOS_DE_PLASTICO,1500,Consumible
+VASOS DE PLASTICO,1500,Consumible
 CUCHARITAS,500,Consumible
 PLATOS,250,Consumible
-GUANTES_DESCATABLES,100,Consumible
-BOLSAS_SANDWICH,100,Consumible
-BOLSAS_ZIPLOC,50,Consumible
-PAPEL_TOALLA,5,Consumible
+GUANTES DESCATABLES,100,Consumible
+BOLSAS SANDWICH,100,Consumible
+BOLSAS ZIPLOC,50,Consumible
+PAPEL TOALLA,5,Consumible
 MANTAS,10,Activo
-FANALES_ALTOS,6,Activo
-FANALES_BAJOS,6,Activo
+FANALES ALTOS,6,Activo
+FANALES BAJOS,6,Activo
 FOSFOROS,10,Consumible
-EXTENSIONES_ELECTRICAS,6,Activo
+EXTENSIONES ELECTRICAS,6,Activo
 LINTERNAS,22,Activo
-CINTAS_DE_EMBALAJE,8,Consumible
-CINTA_AISLANTE,1,Consumible
-MAQUINA_EMBALAJE_CINTA,1,Activo
-CINTILLOS_PLASTICOS,200,Consumible
+CINTAS DE EMBALAJE,8,Consumible
+CINTA AISLANTE,1,Consumible
+MAQUINA EMBALAJE CINTA,1,Activo
+CINTILLOS PLASTICOS,200,Consumible
 TRIPODE,1,Activo
 ENCHUFE,5,Activo
-ROLLO_SOGUILLA,1,Consumible
-PILAS_AA,60,Consumible
-PILAS_AAA,50,Consumible
+ROLLO SOGUILLA,1,Consumible
+PILAS AA,60,Consumible
+PILAS AAA,50,Consumible
 VELAS,21,Consumible
-OLLA_DE_BARRO,1,Activo
-CACEROLA_DE_METAL,1,Activo
-CUCAHARA_DE_MADERA,1,Activo
+OLLA DE BARRO,1,Activo
+CACEROLA DE METAL,1,Activo
+CUCAHARA DE MADERA,1,Activo
 REPELENTES,3,Consumible
-CEPILLOS_DE_DIENTES,3,Consumible
-PASTA_DENTAL,7,Consumible
-DESODORANTE_SACHET,5,Consumible
+CEPILLOS DE DIENTES,3,Consumible
+PASTA DENTAL,7,Consumible
+DESODORANTE SACHET,5,Consumible
 SHAMPOO,13,Consumible
-MAQUINAS_DE_AFEITAR,7,Consumible
+MAQUINAS DE AFEITAR,7,Consumible
 MASCARILLAS,2,Consumible
 JABONES,200,Consumible
 ROSARIO,63,Consumible
-BIBLIAS_AZULES,13,Consumible
-BIBLIAS_LATINOAMERICANAS,4,Consumible
+BIBLIAS AZULES,13,Consumible
+BIBLIAS LATINOAMERICANAS,4,Consumible
 CUADERNILLOS,35,Consumible
-AGUA_BENDITA,37,Consumible
-CAFÉ_PARA_PASAR,8,Consumible
-CAFÉ_INSTANTANEO,3,Consumible
+AGUA BENDITA,37,Consumible
+CAFE PARA PASAR,8,Consumible
+CAFE INSTANTANEO,3,Consumible
 STEVIA,200,Consumible
-FUENTES_MELAMINE,13,Activo
-BOWLS_PLASTICOS,2,Activo
-CANASTA_DE_PAJA,1,Activo
+FUENTES MELAMINE,13,Activo
+BOWLS PLASTICOS,2,Activo
+CANASTA DE PAJA,1,Activo
 ENGRAPADORA,3,Activo
 PERFORADOR,1,Activo
-DISPENSADOR_DE_CINTA,2,Activo
+DISPENSADOR DE CINTA,2,Activo
 TIJERAS,2,Activo
 LAPILCEROS,150,Consumible
-MICAS_MALETAS,100,Consumible
-MICAS_GAFETES,100,Consumible
+MICAS MALETAS,100,Consumible
+MICAS GAFETES,100,Consumible
 LIMPIATIPOS,3,Consumible
-HOJAS_BOND,5,Consumible
-FOLDER_MANILA,25,Consumible
-PLUMONES_MARCADORES,8,Consumible
-HOJAS_DE_COLOR,50,Consumible
+HOJAS BOND,5,Consumible
+FOLDER MANILA,25,Consumible
+PLUMONES MARCADORES,8,Consumible
+HOJAS DE COLOR,50,Consumible
 MICAS,80,Consumible
 GUILLOTINA,1,Activo
 LIGAS,1,Consumible
 GRAPAS,1,Consumible
-baygon_(zancudos_usados),6,Consumible
-limpia_todo_facil_(usado),1,Consumible
-lavavajillas_sapolio_x_500ml,2,Consumible
-lavavajillas_ayudin__x_900_ml,2,Consumible
-jabon_liquido_x_1lt,6,Consumible
-limpiador_en_polvo_sapolio_usado,1,Consumible
-spray_limpiador_de_baño_usado,2,Consumible
-vape_incienso_mosquitos_(sueltos),5,Consumible
-guantes_de_latex,4,Consumible
-trapeador_mopa_,1,Activo
-bolsa_de_basura__x_70_ltrs,30,Consumible
-paños_multiusos_clorox,2,Consumible
-alcohol_gel_x_400_ml_,1,Consumible
-esponja_lavavajillas_scotch_brite,8,Consumible
-escobilla_limpia_baño_hude,1,Consumible
-trapos_amarillos,2,Consumible
+baygon zancudos (usados),6,Consumible
+limpia todo facil (usado),1,Consumible
+lavavajillas sapolio x 500ml,2,Consumible
+lavavajillas ayudin  x 900 ml,2,Consumible
+jabon liquido x 1lt,6,Consumible
+limpiador en polvo sapolio usado,1,Consumible
+spray limpiador de bano usado,2,Consumible
+vape incienso mosquitos (sueltos),5,Consumible
+guantes de latex,4,Consumible
+trapeador mopa,1,Activo
+bolsa de basura x 70ltrs,30,Consumible
+panos multiusos clorox,2,Consumible
+alcohol gel x 400ml,1,Consumible
+esponja lavavajillas scotch brite,8,Consumible
+escobilla limpia bano hude,1,Consumible
+trapos amarillos,2,Consumible
 ESPIRALES,50,Consumible
-PAÑOS_AMARILLOS,32,Consumible
-REPELENTES_ELECTRICOS,4,Consumible
-GUANTES_DE_JEBE,5,Consumible
+PANOS AMARILLOS,32,Consumible
+REPELENTES ELECTRICOS,4,Consumible
+GUANTES DE JEBE,5,Consumible
 RECOGEDOR,1,Activo
-ISOPO_DE_BAÑO,1,Activo
+ISOPO DE BAnO,1,Activo
 INSECTICIDAS,4,Consumible
 TRAPEADOR,1,Activo
-BOLSAS_DE_BASURA,400,Consumible
-BOLSAS_DE_CAMINANTES,100,Consumible
-VELAS_A_PILAS,60,Activo
-CINTAS_DE_GAFETES,50,Consumible
-JARRAS_DE_PLASTICO,2,Activo
-BOWL_DE_PLASTICO,1,Activo
+BOLSAS DE BASURA,400,Consumible
+BOLSAS DE CAMINANTES,100,Consumible
+VELAS A PILAS,60,Activo
+CINTAS DE GAFETES,50,Consumible
+JARRAS DE PLASTICO,2,Activo
+BOWL DE PLASTICO,1,Activo
