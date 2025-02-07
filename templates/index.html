@@ -99,12 +99,13 @@
         </thead>
         <tbody>
             {% for nombre, datos in inventario.items() %}
-            <tr>
+   	 <tr>
                 <td>{{ nombre }}</td>
-                <td>{{ datos['cantidad'] }}</td>
-                <td>{{ datos['categoria'] }}</td>
-            </tr>
-            {% endfor %}
+               <td>{{ datos.cantidad }}</td>
+               <td>{{ datos.categoria }}</td>
+               <td>{{ datos.consumo_estimado }}</td>
+              </tr>
+             {% endfor %}
         </tbody>
     </table>
 
