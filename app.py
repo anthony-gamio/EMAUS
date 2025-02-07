@@ -13,7 +13,7 @@ if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # Añadir opciones SSL si es necesario
-DATABASE_URL += "?sslmode=verify-full"
+DATABASE_URL += "?sslmode=disable"
 
 # Crear el motor y la sesión de SQLAlchemy
 engine = create_engine(DATABASE_URL)
