@@ -9,11 +9,13 @@ app = Flask(__name__)
 
 # Configuración de la base de datos
 DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("La variable de entorno DATABASE_URL no está configurada.")
+
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Añadir opciones SSL si es necesario
-DATABASE_URL += "?sslmode=disable"
+DATABASE_URL += "?sslmode=require"
 
 # Crear el motor y la sesión de SQLAlchemy
 engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=10, max_overflow=20)
