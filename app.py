@@ -16,7 +16,7 @@ if DATABASE_URL.startswith("postgres://"):
 DATABASE_URL += "?sslmode=disable"
 
 # Crear el motor y la sesión de SQLAlchemy
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=10, max_overflow=20)
 Session = sessionmaker(bind=engine)
 session = Session()
 
