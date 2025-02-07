@@ -5,8 +5,14 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # Configuración de la base de datos (usa tu URL de conexión de Render)
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://inventario_emaus_user:09YZExz3HHN8Ysq0S4JA6yzWL5vEXm2d@dpg-cuio2kd6l47c73ahk30g-a.oregon-postgres.render.com/inventario_emaus')
-engine = create_engine(DATABASE_URL)
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgres://inventario_emaus_user:09YZExz3HHN8Ysq0S4JA6yzWL5vEXm2d@dpg-cuio2kd6l47c73ahk30g-a.oregon-postgres.render.com/inventario_emaus')
+
+# Corrección para compatibilidad de URL con SQLAlchemy
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Crear el motor de base de datos con SSL habilitado (requerido por Render)
+engine = create_engine(DATABASE_URL, connect_args={"sslmode": "require"})
 Base = declarative_base()
 
 # Inicializar la aplicación Flask
