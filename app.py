@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, request
-from sqlalchemy import create_engine, Column, Integer, String, Float
+from flask import Flask, render_template, request, redirect, url_for
+from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
@@ -28,13 +28,17 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-@app.route('/agregar_item', methods=['POST'])
-def agregar_item():
-    data = request.json
-    nombre = data.get('nombre')
-    cantidad = data.get('cantidad', 0)
-    categoria = data.get('categoria')
-    
+@app.route('/')
+def index():
+    inventario = session.query(Item).all()
+    return render_template('index.html', inventario={item.nombre: {'cantidad': item.cantidad, 'categoria': item.categoria} for item in inventario})
+
+@app.route('/agregar', methods=['POST'])
+def agregar():
+    nombre = request.form.get('nombre')
+    cantidad = int(request.form.get('cantidad', 0))
+    categoria = request.form.get('categoria')
+
     item = session.query(Item).filter_by(nombre=nombre).first()
     if item:
         item.cantidad += cantidad
@@ -42,46 +46,18 @@ def agregar_item():
         nuevo_item = Item(nombre=nombre, cantidad=cantidad, categoria=categoria)
         session.add(nuevo_item)
     session.commit()
-    return jsonify({'mensaje': 'Item agregado exitosamente'})
+    return redirect(url_for('index'))
 
-@app.route('/mostrar_inventario', methods=['GET'])
-def mostrar_inventario():
-    inventario = session.query(Item).all()
-    resultado = [{'nombre': item.nombre, 'cantidad': item.cantidad, 'categoria': item.categoria, 'consumo_estimado': item.consumo_estimado or 'N/A'} for item in inventario]
-    return jsonify(resultado)
+@app.route('/consumo', methods=['POST'])
+def consumo():
+    nombre = request.form.get('nombre')
+    consumo_estimado = int(request.form.get('consumo_estimado'))
 
-@app.route('/calcular_consumo_estimado', methods=['POST'])
-def calcular_consumo_estimado():
-    data = request.json
-    nombre = data.get('nombre')
-    consumo_estimado = data.get('consumo_estimado')
-    
     item = session.query(Item).filter_by(nombre=nombre).first()
     if item:
         item.consumo_estimado = consumo_estimado
         session.commit()
-        return jsonify({'mensaje': f"Consumo estimado actualizado para {nombre}"})
-    return jsonify({'mensaje': f"El artículo {nombre} no existe en el inventario"})
-
-@app.route('/actualizar_cantidad', methods=['POST'])
-def actualizar_cantidad():
-    data = request.json
-    nombre = data.get('nombre')
-    nueva_cantidad = data.get('nueva_cantidad')
-    
-    item = session.query(Item).filter_by(nombre=nombre).first()
-    if item:
-        item.cantidad = nueva_cantidad
-        session.commit()
-        return jsonify({'mensaje': f"Cantidad actualizada para {nombre}: {nueva_cantidad}"})
-    return jsonify({'mensaje': f"El artículo {nombre} no existe en el inventario."})
-
-@app.route('/reporte_bajo_stock', methods=['GET'])
-def reporte_bajo_stock():
-    umbral = int(request.args.get('umbral', 10))
-    bajo_stock = session.query(Item).filter(Item.cantidad < umbral).all()
-    resultado = [{'nombre': item.nombre, 'cantidad': item.cantidad, 'categoria': item.categoria} for item in bajo_stock]
-    return jsonify(resultado)
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
