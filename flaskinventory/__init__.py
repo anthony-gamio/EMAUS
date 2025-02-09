@@ -11,5 +11,9 @@ db = SQLAlchemy(app)
 
 from flaskinventory import routes
 
-db.create_all()
-db.session.commit()
+with app.app_context():
+    db.create_all()
+    # Si tienes datos de ejemplo para insertar:
+    # nuevo_dato = ModeloEjemplo(campo='valor')
+    # db.session.add(nuevo_dato)
+    db.session.commit()
