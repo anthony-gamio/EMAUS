@@ -4,7 +4,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-app = Flask(__name__)
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
@@ -27,6 +27,10 @@ class Config:
         SQLALCHEMY_DATABASE_URI = db_url
     else:
         SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+
+app = Flask(__name__)
+
+app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 
