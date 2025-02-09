@@ -5,23 +5,29 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '323b22caac41acbf'
+basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Configuración de la base de datos
-DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    raise ValueError("La variable de entorno DATABASE_URL no está configurada.")
+class Config:
+    # La SECRET_KEY se usa para proteger sesiones, formularios (CSRF), etc.
+    SECRET_KEY = os.environ.get('SECRET_KEY') or '323b22caac41acbf'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+  # Obtener la URL de la base de datos desde la variable de entorno DATABASE_URL
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        # Si la URL usa el prefijo "postgres://", reemplázalo por "postgresql://"
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        # Forzar el uso de SSL para todas las conexiones, solo si no se ha especificado ya
+        if "sslmode" not in db_url:
+            if '?' in db_url:
+                db_url += "&sslmode=require"
+            else:
+                db_url += "?sslmode=require"
+        SQLALCHEMY_DATABASE_URI = db_url
+    else:
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 
-# Crear el motor y la sesión de SQLAlchemy
-engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=10, max_overflow=20)
-Session = sessionmaker(bind=engine)
-session = Session()
-
-# Configuración para SQLAlchemy en Flask
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 db = SQLAlchemy(app)
 
 from flaskinventory import routes
