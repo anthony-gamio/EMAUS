@@ -6,7 +6,12 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '323b22caac41acbf'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') + '?sslmode=require'
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "connect_args": {
+        "sslmode": "require"
+    }
+}
 db = SQLAlchemy(app)
 
 from flaskinventory import routes
