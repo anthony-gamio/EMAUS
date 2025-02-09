@@ -9,4 +9,3 @@ SQLAlchemy==1.3.3
 Werkzeug==0.15.3
 WTForms==2.2.1
 gunicorn
-python_version == 3.9.16
