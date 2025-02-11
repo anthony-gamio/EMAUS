@@ -31,6 +31,22 @@
             margin-top: 20px;
         }
         button:hover { background-color: #218838; }
+        #filtros-container {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        }
+
+        #filtros-container label {
+        margin-right: 10px;
+        font-weight: bold;
+        }
+
+        #filtros-container select {
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -47,7 +63,27 @@
 <h2>Actividades</h2>
 
 <form action="{{ url_for('actualizar_actividades') }}" method="post">
-    <table id="actividadesTabla">
+    <div id="filtros-container" style="margin-bottom: 15px;">
+        
+        <!-- Filtro Día en su propia línea -->
+        <div style="margin-bottom: 10px; display: block;">
+            <label for="filtro-dia" style="display: block; margin-bottom: 5px;">Día:</label>
+            <select id="filtro-dia" style="display: block; width: 100%;">
+                <option value="">Todos los días</option>
+            </select>
+        </div>
+
+        <!-- Filtro Grupo Función en su propia línea -->
+        <div style="margin-bottom: 10px; display: block;">
+            <label for="filtro-grupo" style="display: block; margin-bottom: 5px;">Grupo Función:</label>
+            <select id="filtro-grupo" style="display: block; width: 100%;">
+                <option value="">Todos los grupos</option>
+            </select>
+        </div>
+        
+    </div>
+
+    <table id="actividadesTabla" class="display">
         <thead>
             <tr>
                 <th>Día</th>
@@ -74,11 +110,11 @@
 
 <script>
     $(document).ready(function() {
-        $('#actividadesTabla').DataTable({
-            "paging": true,          // Habilita la paginación
-            "searching": true,       // Habilita la barra de búsqueda
-            "ordering": true,        // Habilita la ordenación por columnas
-            "order": [[1, "desc"]],  // Orden predeterminado: por cantidad (columna 1) descendente
+        var table = $('#actividadesTabla').DataTable({
+            "order": [[0, 'asc']],    // Ordenar por Día ascendente
+            "paging": false,          // Desactivar paginación
+            "searching": true,        // Mantener la barra de búsqueda general
+            "ordering": false,        // Desactivar la ordenación manual
             "language": {
                 "search": "Buscar:",
                 "lengthMenu": "Mostrar _MENU_ registros por página",
@@ -91,8 +127,37 @@
                 }
             }
         });
+
+        // Llenar el filtro de Días
+        var diasUnicos = table.column(0).data().unique().sort();
+        diasUnicos.each(function(dia) {
+            if (dia) {
+                $('#filtro-dia').append('<option value="' + dia + '">' + dia + '</option>');
+            }
+        });
+
+        // Llenar el filtro de Grupos de Función
+        var gruposUnicos = table.column(2).data().unique().sort();
+        gruposUnicos.each(function(grupo) {
+            if (grupo) {
+                $('#filtro-grupo').append('<option value="' + grupo + '">' + grupo + '</option>');
+            }
+        });
+
+        // Evento para filtrar por Día
+        $('#filtro-dia').on('change', function() {
+            var filtroDia = $(this).val();
+            table.column(0).search(filtroDia).draw();
+        });
+
+        // Evento para filtrar por Grupo de Función
+        $('#filtro-grupo').on('change', function() {
+            var filtroGrupo = $(this).val();
+            table.column(2).search(filtroGrupo).draw();
+        });
     });
 </script>
+
 
 </body>
 </html>

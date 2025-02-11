@@ -109,6 +109,10 @@ def actividades():
 
             # Asegurarse de que la columna 'Estado' es booleana
             df['Estado'] = df['Estado'].astype(bool)
+            dias_ordenados = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+            df['Día'] = df['Día'].str.capitalize()
+            df['Día'] = pd.Categorical(df['Día'], categories=dias_ordenados, ordered=True)
+            df = df.sort_values('Día')
 
             actividades = df.to_dict(orient='records')
 
