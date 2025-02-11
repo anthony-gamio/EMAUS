@@ -1,4 +1,4 @@
-﻿Día,Actividad,Grupo función,Estado
+﻿Día,Actividad,Grupo Función,Estado
 Jueves,Oración Inicial,,True
 Jueves,Ambientación de sala,,False
 Jueves,Definición Circuito Pared-Confesiones-Lavado de manos,,True
@@ -14,7 +14,7 @@ Jueves,Asignacion servidores y caminantes / mesas y habitaciones,,False
 Jueves,Almuerzo,,True
 Jueves,Rol de vigilia,,False
 Jueves,Misa,,True
-Jueves,Bendición de Biblias, mantelitos, rosarios, palanquitas, etc,,False
+Jueves,Bendición de Biblias mantelitos rosarios palanquitas etc,,False
 Jueves,Exposición del Sagrado Sacramento + iluminación+música,,True
 Jueves,Rezo del Santo Rosario (Misterios Gloriosos),,False
 Jueves,Organizar las mesas de registro,,True
@@ -25,8 +25,8 @@ Viernes,Snack de liquidos,,True
 Viernes,Suena la campana para reunir a los Caminantes en el auditorio,,False
 Viernes,Bienvenida a los Caminantes en el auditorio / Confidencialidad,,True
 Viernes,Reglas de la Casa,,False
-Viernes,Pasar lista de los Caminantes, asignarles mesa y traslado en orden al comedor,,True
-Viernes,Cena - Bendición de los alimentos y petición por los Caminantes y su retiro ,,False
+Viernes,Pasar lista de los Caminantes asignarles mesa y traslado en orden al comedor,,True
+Viernes,Cena - Bendición de los alimentos y petición por los Caminantes y su retiro,,False
 Viernes,Aviso para ir baño en 5 min y posterior reunión en el auditorio,,True
 Viernes,Presentaciones,,False
 Viernes,Snack (LIQUIDOS y GALLETAS),Reparto de los diarios,True
@@ -50,26 +50,26 @@ Sábado,Baño 5min y luego reunión en auditorio,,False
 Sábado,Resumen de todas las actividades del viernes,,True
 Sábado,Música y Reflexión,,False
 Sábado,Música y reflexión,,True
-Sábado,Snack (LIQUIDOS, GALLETAS Y FRUTA),,False
+Sábado,Snack (LIQUIDOS GALLETAS Y FRUTA),,False
 Sábado,Música y reflexión,,True
-Sábado,Almuerzo - Oración y bendición ,,False
+Sábado,Almuerzo - Oración y bendición,,False
 Sábado,Baño 5min y luego reunión en auditorio,,True
-Sábado,1. Entrega de chocolates/caramelos en la entrada ,,False
+Sábado,1. Entrega de chocolates/caramelos en la entrada,,False
 Sábado,Preparar sillas para dinámica,,True
 Sábado,Música y Reflexión,,False
 Sábado,Snack (LIQUIDOS y GALLETAS),,True
 Sábado,Música y reflexión,Entrega de rosarios,False
-Sábado,Cena - Oración y bendición de los alimentos ,Entrega de rosarios,True
-Sábado,Baño 5min, pedir que bajen ROPA DE ABRIGO y luego reunión en auditorio,Entrega de rosarios,False
+Sábado,Cena - Oración y bendición de los alimentos,Entrega de rosarios,True
+Sábado,Baño 5min pedir que bajen ROPA DE ABRIGO y luego reunión en auditorio Entrega de rosarios,False
 Sábado,Preparar audio para la zona de quema de pecados,Entrega de rosarios,True
 Sábado,Encendido de fogata,Entrega de rosarios,False
 Sábado,Dinámica de la hoja de los pecados y quema de las cenizas,Entrega de rosarios,True
 Sábado,1. Se entrega a cada Caminante una hoja de papel,Entrega de rosarios,False
 Sábado,Preparar audio en capilla,Entrega de rosarios,True
-Sábado,Dinámica ,Entrega de rosarios,False
+Sábado,Dinámica,Entrega de rosarios,False
 Sábado,Preparar mesa de snack para Sacerdotes,Oración,True
 Sábado,Snack (SOLO LIQUIDOS),Oración,False
-Sábado,Entrega de palancas. ,Oración,True
+Sábado,Entrega de palancas.,Oración,True
 Sábado,SNACKS,Oración,False
 Sábado,Recepción caminantes en snacks,Oración,True
 Sábado,Entrega estipendios,Oración,False
@@ -79,30 +79,30 @@ Sábado,Reparto sandwich a caminantes en la puerta de la iglesia,Oración,True
 Sábado,Levantamiento de los materiales de confesiones,,False
 Sábado,Reordenamiento de auditorio,,True
 Sábado,Reunión de Servidores en auditorio,,False
-Domingo,Diana. Toque de campana. ,,True
+Domingo,Diana. Toque de campana.,,True
 Domingo,Servidores en la Capilla. Tomar precauciones. Respetar el silencio,,False
 Domingo,Caminantes en la Capilla - Oración de la Mañana,,True
 Domingo,Resumen de todas las actividades del sábado,,False
-Domingo,Instrucciones para el desayuno. Donde sentarnos y no voltear los mantelitos ,,True
-Domingo,Desayuno - Bendición de los alimentos ,,False
+Domingo,Instrucciones para el desayuno. Donde sentarnos y no voltear los mantelitos,,True
+Domingo,Desayuno - Bendición de los alimentos,,False
 Domingo,Baño 5min y luego reunión en auditorio,,True
 Domingo,1. Recordar que tengan los maletines listos para bajarlos después de almuerzo,,False
 Domingo,Música y reflexión,,True
-Domingo,Snack (LIQUIDOS, GALLETAS Y FRUTA),,False
+Domingo,Snack (LIQUIDOS GALLETAS Y FRUTA),,False
 Domingo,Levantamiento de Santísimo,,True
 Domingo,Música y reflexión,,False
 Domingo,Dinámica,,True
 Domingo,3. Se entrega a cada Caminante una hoja de papel y sobre,,False
 Domingo,Preparar sillas para dinámica con bolsas para caminantes,,True
-Domingo,Baño 5min, bajar maletines y luego reunión en auditorio,,False
-Domingo,Dinámica ,,True
+Domingo,Baño 5min bajar maletines y luego reunión en auditorio,,False
+Domingo,Dinámica,,True
 Domingo,4.Líderes de mesa distribuyen las bolsas y todos se ponen sus polos blancos,,False
 Domingo,Levantamiento de materiales,,True
 Domingo,Material de confesiones,,False
 Domingo,Utiles de limpieza,,True
 Domingo,Snacks,,False
 Domingo,Equipos de sonido,,True
-Domingo,Banners ,,False
+Domingo,Banners,,False
 Domingo,Santísimo,,True
 Domingo,Recojo y entrega de llaves,,False
 Domingo,Reunión en el auditorio,,True

@@ -100,15 +100,26 @@ def agregar():
 
 @app.route('/actividades')
 def actividades():
-    # Cargar el CSV de actividades
     actividades_path = 'actividades.csv'
+    
     if os.path.exists(actividades_path):
-        df = pd.read_csv(actividades_path)
+        try:
+            # Intentar leer el CSV con codificación UTF-8
+            df = pd.read_csv(actividades_path, encoding='utf-8')
 
-        # Asegurarse de que la columna 'Estado' es booleana
-        df['Estado'] = df['Estado'].astype(bool)
+            # Asegurarse de que la columna 'Estado' es booleana
+            df['Estado'] = df['Estado'].astype(bool)
 
-        actividades = df.to_dict(orient='records')
+            actividades = df.to_dict(orient='records')
+
+        except pd.errors.ParserError as e:
+            # Si hay un error al leer el CSV, mostrar un mensaje claro en la página
+            return f"<h2>Error al leer el CSV de actividades:</h2><p>{e}</p>", 500
+
+        except Exception as e:
+            # Capturar cualquier otro error inesperado
+            return f"<h2>Ocurrió un error inesperado:</h2><p>{e}</p>", 500
+
     else:
         actividades = []
 
@@ -116,8 +127,8 @@ def actividades():
 
 @app.route('/actualizar_actividades', methods=['POST'])
 def actualizar_actividades():
-    actividades_path = 'actividades.csv'
-    df = pd.read_csv(actividades_path)
+    actividades_path = ('actividades.csv')
+    df = pd.read_csv(actividades_path, encoding='utf-8')
 
     # Actualizar el estado de 'Estado' según los checkboxes enviados
     for i in range(len(df)):

@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
+<!-- Incluye jQuery (necesario para DataTables) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
 <head>
     <meta charset="UTF-8">
     <title>Actividades del Retiro</title>
@@ -27,15 +35,19 @@
 </head>
 <body>
 
+    <h1>
+        <!--<img src="{{ url_for('static', filename='.png') }}" alt="Logo" class="logo-img">-->
+        Logística Emaús
+    </h1>
 <nav>
     <a href="{{ url_for('index') }}">Inventario</a>
     <a href="{{ url_for('actividades') }}">Actividades</a>
 </nav>
 
-<h2>Checklist de Actividades del Retiro</h2>
+<h2>Actividades</h2>
 
 <form action="{{ url_for('actualizar_actividades') }}" method="post">
-    <table>
+    <table id="actividadesTabla">
         <thead>
             <tr>
                 <th>Día</th>
@@ -59,6 +71,28 @@
     </table>
     <button type="submit">Guardar Cambios</button>
 </form>
+
+<script>
+    $(document).ready(function() {
+        $('#actividadesTabla').DataTable({
+            "paging": true,          // Habilita la paginación
+            "searching": true,       // Habilita la barra de búsqueda
+            "ordering": true,        // Habilita la ordenación por columnas
+            "order": [[1, "desc"]],  // Orden predeterminado: por cantidad (columna 1) descendente
+            "language": {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
