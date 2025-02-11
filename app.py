@@ -98,19 +98,36 @@ def agregar():
 
     return redirect(url_for('index'))
 
-@app.route('/checklist')
-def checklist():
+@app.route('/actividades')
+def actividades():
     # Cargar el CSV de actividades
-    checklist_path = 'checklist.csv'
-    if os.path.exists(checklist_path):
-        df = pd.read_csv(checklist_path)
-        # Convertir la columna 'completado' a booleano para los checkboxes
-        df['completado'] = df['completado'].astype(bool)
+    actividades_path = 'actividades.csv'
+    if os.path.exists(actividades_path):
+        df = pd.read_csv(actividades_path)
+
+        # Asegurarse de que la columna 'Estado' es booleana
+        df['Estado'] = df['Estado'].astype(bool)
+
         actividades = df.to_dict(orient='records')
     else:
         actividades = []
-    
-    return render_template('checklist.html', checklist=actividades)
+
+    return render_template('actividades.html', actividades=actividades)
+
+@app.route('/actualizar_actividades', methods=['POST'])
+def actualizar_actividades():
+    actividades_path = 'actividades.csv'
+    df = pd.read_csv(actividades_path)
+
+    # Actualizar el estado de 'Estado' según los checkboxes enviados
+    for i in range(len(df)):
+        checkbox_name = f'completado_{i}'
+        df.at[i, 'Estado'] = checkbox_name in request.form  # True si está marcado, False si no
+
+    # Guardar los cambios en el CSV
+    df.to_csv(actividades_path, index=False)
+
+    return redirect(url_for('actividades'))
 
 if __name__ == '__main__':
     app.run(debug=True)

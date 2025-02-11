@@ -14,7 +14,7 @@ PAPEL TOALLA,5,Consumible
 MANTAS,10,Activo
 FANALES ALTOS,6,Activo
 FANALES BAJOS,6,Activo
-FOSFOROS,10,Consumible
+FOSFOROS X CAJA,10,Consumible
 EXTENSIONES ELECTRICAS,6,Activo
 LINTERNAS,22,Activo
 CINTAS DE EMBALAJE,8,Consumible
@@ -36,15 +36,15 @@ PASTA DENTAL,7,Consumible
 DESODORANTE SACHET,5,Consumible
 SHAMPOO,13,Consumible
 MAQUINAS DE AFEITAR,7,Consumible
-MASCARILLAS,2,Consumible
+MASCARILLAS X CAJA,2,Consumible
 JABONES,200,Consumible
 ROSARIO,63,Consumible
 BIBLIAS AZULES,13,Consumible
 BIBLIAS LATINOAMERICANAS,4,Consumible
 CUADERNILLOS,35,Consumible
 AGUA BENDITA,37,Consumible
-CAFE PARA PASAR,8,Consumible
-CAFE INSTANTANEO,3,Consumible
+CAFE PARA PASAR 500G,8,Consumible
+CAFE INSTANTANEO 190G,3,Consumible
 STEVIA,200,Consumible
 FUENTES MELAMINE,13,Activo
 BOWLS PLASTICOS,2,Activo
@@ -53,40 +53,39 @@ ENGRAPADORA,3,Activo
 PERFORADOR,1,Activo
 DISPENSADOR DE CINTA,2,Activo
 TIJERAS,2,Activo
-LAPILCEROS,150,Consumible
+LAPICEROS,150,Consumible
 MICAS MALETAS,100,Consumible
 MICAS GAFETES,100,Consumible
 LIMPIATIPOS,3,Consumible
-HOJAS BOND,5,Consumible
+HOJAS BOND X MILLAR,5,Consumible
 FOLDER MANILA,25,Consumible
 PLUMONES MARCADORES,8,Consumible
 HOJAS DE COLOR,50,Consumible
 MICAS,80,Consumible
 GUILLOTINA,1,Activo
-LIGAS,1,Consumible
-GRAPAS,1,Consumible
-baygon zancudos (usados),6,Consumible
-limpia todo facil (usado),1,Consumible
-lavavajillas sapolio x 500ml,2,Consumible
-lavavajillas ayudin  x 900 ml,2,Consumible
-jabon liquido x 1lt,6,Consumible
-limpiador en polvo sapolio usado,1,Consumible
-spray limpiador de bano usado,2,Consumible
-vape incienso mosquitos (sueltos),5,Consumible
-guantes de latex,4,Consumible
-trapeador mopa,1,Activo
-bolsa de basura x 70ltrs,30,Consumible
-panos multiusos clorox,2,Consumible
-alcohol gel x 400ml,1,Consumible
-esponja lavavajillas scotch brite,8,Consumible
-escobilla limpia bano hude,1,Consumible
-trapos amarillos,2,Consumible
+LIGAS X CAJA,1,Consumible
+GRAPAS X CAJA,1,Consumible
+BAYGON,6,Consumible
+LIMPIA TODO FACIL X 4LT,1,Consumible
+LAVAVAJILLAS X 500ML,6,Consumible
+JABON LIQUIDO X 1LT,6,Consumible
+LIMPIADOR EN POLVO SAPOLIO,1,Consumible
+SPRAY LIMPIADOR DE BANO,2,Consumible
+VAPE INCIENSO MOSQUITOS X CAJA,5,Consumible
+GUANTES DE LATEX,4,Consumible
+TRAPEADOR MOPA,1,Activo
+BOLSA BASURA X 70LT,30,Consumible
+PANOS MULTIUSOS CLOROX,2,Consumible
+ALCOHOL GEL X 400ML,1,Consumible
+ESPONJA LAVAVAJILLAS,8,Consumible
+ESCOBILLA LIMPIA BANO HUDE,1,Consumible
+TRAPOS AMARILLOS,2,Consumible
 ESPIRALES,50,Consumible
 PANOS AMARILLOS,32,Consumible
 REPELENTES ELECTRICOS,4,Consumible
 GUANTES DE JEBE,5,Consumible
 RECOGEDOR,1,Activo
-ISOPO DE BAnO,1,Activo
+ISOPO DE BANO,1,Activo
 INSECTICIDAS,4,Consumible
 TRAPEADOR,1,Activo
 BOLSAS DE BASURA,400,Consumible
