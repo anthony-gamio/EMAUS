@@ -112,19 +112,5 @@ def checklist():
     
     return render_template('checklist.html', checklist=actividades)
 
-@app.route('/logout')
-def logout():
-    # Cargar el CSV de actividades
-    checklist_path = 'checklist.csv'
-    if os.path.exists(checklist_path):
-        df = pd.read_csv(checklist_path)
-        # Convertir la columna 'completado' a booleano para los checkboxes
-        df['completado'] = df['completado'].astype(bool)
-        actividades = df.to_dict(orient='records')
-    else:
-        actividades = []
-    
-    return render_template('checklist.html', checklist=actividades)
-
 if __name__ == '__main__':
     app.run(debug=True)
