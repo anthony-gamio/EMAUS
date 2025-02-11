@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import os
+import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from urllib.parse import quote_plus
@@ -38,6 +39,42 @@ class Item(Base):
 # Crear tablas si no existen
 Base.metadata.create_all(engine)
 
+
+# Función para vaciar la tabla inicial
+def reiniciar_tabla():
+    session.query(Item).delete()
+    session.commit()
+    print("La tabla 'inventario' ha sido vaciada.")
+
+reiniciar_tabla()
+
+
+# Cargar CSV solo si la tabla está vacía
+def cargar_csv_inicial():
+    if session.query(Item).count() == 0:
+        # Asegúrate de que el archivo CSV esté en la misma carpeta o ajusta la ruta
+        csv_path = 'inventario.csv'  
+        if os.path.exists(csv_path):
+            df = pd.read_csv(csv_path)
+            for _, row in df.iterrows():
+                item = Item(
+                    nombre=row['nombre'],
+                    cantidad=row['cantidad'],
+                    categoria=row['categoria'],
+                    consumo_estimado=row.get('consumo_estimado', 0)  # Valor predeterminado si falta
+                )
+                session.add(item)
+            session.commit()
+            print("Datos cargados exitosamente desde el CSV.")
+        else:
+            print(f"El archivo {csv_path} no existe.")
+    else:
+        print("La tabla ya contiene datos. No se cargará el CSV.")
+
+# Llamar a la función al iniciar la aplicación
+cargar_csv_inicial()
+
+
 @app.route('/')
 def index():
     inventario = session.query(Item).all()
@@ -46,13 +83,19 @@ def index():
 @app.route('/agregar', methods=['POST'])
 def agregar():
     nombre = request.form['nombre']
-    cantidad = request.form['cantidad']
+    cantidad = int(request.form['cantidad'])
     categoria = request.form['categoria']
-    consumo_estimado = request.form['consumo_estimado']
 
-    nuevo_item = Item(nombre=nombre, cantidad=cantidad, categoria=categoria, consumo_estimado=consumo_estimado)
-    session.add(nuevo_item)
-    session.commit()
+    item_existente = session.query(Item).filter_by(nombre=nombre, categoria=categoria).first()
+
+    if item_existente:
+        item_existente.cantidad += cantidad
+        session.commit()
+            
+    else:
+        nuevo_item = Item(nombre=nombre, cantidad=cantidad, categoria=categoria)
+        session.add(nuevo_item)
+        session.commit()
 
     return redirect(url_for('index'))
 
