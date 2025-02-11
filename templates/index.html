@@ -39,7 +39,7 @@
             color: black;
         }
         .logo-img {
-        height: 55px;  /* Ajusta el tamaño del logo */
+        height: 60px;  /* Ajusta el tamaño del logo */
         margin-right: 10px;  /* Espacio entre el logo y el texto */
         vertical-align: middle;
         }
@@ -100,12 +100,11 @@
 </head>
 <body>
 
-    <h1><img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">Sistema Logístico - Emaús</h1>
+    <h1><img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">Logística Emaús</h1>
 <!-- Menú de Navegación -->
 <nav>
     <a href="{{ url_for('index') }}">Inventario</a>
     <a href="{{ url_for('checklist') }}">Checklist</a>
-    <a href="{{ url_for('logout') }}" class="right">Cerrar Sesión</a>
 </nav>
 
 <!-- Contenido de la página -->
