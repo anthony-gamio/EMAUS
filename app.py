@@ -72,12 +72,17 @@ class AsignacionItem(db.Model):
 Base.metadata.create_all(engine)
 with app.app_context():
     db.create_all()
+
 # Función para vaciar la tabla inicial
 def reiniciar_tabla():
-    session.query(Item).delete()
-    session.commit()
-    print("La tabla 'inventario' ha sido vaciada.")
-reiniciar_tabla()
+    if os.getenv('FLASK_ENV') == 'development':
+        session.query(AsignacionItem).delete()
+        session.query(Inventario).delete()
+        session.commit()
+        print("La tabla 'inventario' y 'asignacion_items' han sido vaciadas en el entorno local.")
+    else:
+        print("No se vacía la tabla en producción.")
+
 
 # Cargar CSV solo si la tabla está vacía
 def cargar_csv_inicial():
