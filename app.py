@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 import pandas as pd
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import sessionmaker, relationship
 from urllib.parse import quote_plus
 
 app = Flask(__name__)
@@ -16,16 +16,19 @@ if not DATABASE_URL:
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Crear el motor y la sesión de SQLAlchemy
 engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=10, max_overflow=20)
 Session = sessionmaker(bind=engine)
 session = Session()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Definición del modelo
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 
 Base = declarative_base()
+db = SQLAlchemy(app)
 
 class Item(Base):
     __tablename__ = 'inventario'
@@ -35,18 +38,48 @@ class Item(Base):
     categoria = Column(String)
     consumo_estimado = Column(Integer)
 
+class Area(db.Model):
+    __tablename__ = 'areas'
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String, nullable=False, unique=True)
+    materiales = relationship('Material', backref='area', cascade="all, delete-orphan")
+
+class Material(db.Model):
+    __tablename__ = 'materiales'
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String, nullable=False)
+    area_id = Column(Integer, ForeignKey('areas.id'), nullable=False)
+    asignaciones = relationship('AsignacionItem', backref='material', cascade="all, delete-orphan")
+
+class Inventario(db.Model):
+    __tablename__ = 'inventario'
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String, nullable=False)
+    cantidad = Column(Integer, nullable=False)
+    categoria = Column(String, nullable=False)
+    consumo_estimado = Column(Integer, default=0)
+
+# Modelo para la Asignación de Ítems
+class AsignacionItem(db.Model):
+    __tablename__ = 'asignacion_items'
+    id = Column(Integer, primary_key=True)
+    material_id = Column(Integer, ForeignKey('materiales.id'), nullable=False)
+    item_id = Column(Integer, ForeignKey('inventario.id'), nullable=False)
+    cantidad_asignada = Column(Integer, nullable=False)
+    
+    # Relación para acceder al ítem del inventario directamente
+    item = relationship('Inventario', backref='asignaciones')
+
 # Crear tablas si no existen
 Base.metadata.create_all(engine)
-
-
+with app.app_context():
+    db.create_all()
 # Función para vaciar la tabla inicial
 def reiniciar_tabla():
     session.query(Item).delete()
     session.commit()
     print("La tabla 'inventario' ha sido vaciada.")
-
 reiniciar_tabla()
-
 
 # Cargar CSV solo si la tabla está vacía
 def cargar_csv_inicial():
@@ -72,7 +105,6 @@ def cargar_csv_inicial():
 
 # Llamar a la función al iniciar la aplicación
 cargar_csv_inicial()
-
 
 @app.route('/')
 def index():
@@ -143,6 +175,27 @@ def actualizar_actividades():
     df.to_csv(actividades_path, index=False)
 
     return redirect(url_for('actividades'))
+
+@app.route('/areas')
+def areas():
+    todas_areas = Area.query.all()
+    return render_template('gestionar_areas.html', areas=todas_areas)
+
+@app.route('/areas/agregar', methods=['POST'])
+def agregar_area():
+    nombre_area = request.form.get('nombre_area')
+    if nombre_area:
+        nueva_area = Area(nombre=nombre_area)
+        db.session.add(nueva_area)
+        db.session.commit()
+    return redirect(url_for('areas'))
+
+@app.route('/areas/eliminar/<int:area_id>', methods=['POST'])
+def eliminar_area(area_id):
+    area = Area.query.get_or_404(area_id)
+    db.session.delete(area)
+    db.session.commit()
+    return redirect(url_for('areas'))
 
 if __name__ == '__main__':
     app.run(debug=True)

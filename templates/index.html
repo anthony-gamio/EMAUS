@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión Logistica</title>
     <style>
-         body {
+        body {
             font-family: Arial, sans-serif;
             margin: 20px;
             padding: 20px;
@@ -108,6 +108,7 @@
 <nav>
     <a href="{{ url_for('index') }}">Inventario</a>
     <a href="{{ url_for('actividades') }}">Actividades</a>
+    <a href="{{ url_for('areas') }}">Areas</a>
 </nav>
 
 <!-- Contenido de la página -->
@@ -126,16 +127,7 @@
         </select><br>
         <button type="submit">Agregar</button>
     </form>
-
-    <h2>Consumo Estimado</h2>
-    <form action="/consumo" method="post">
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required><br>
-        <label for="consumo_estimado">Definir:</label>
-        <input type="number" id="consumo_estimado" name="consumo_estimado" required><br>
-        <button type="submit">Calcular</button>
-    </form>
-
+    
     <h2>Inventario Actual</h2>
     <table id="inventarioTabla">
             <thead>

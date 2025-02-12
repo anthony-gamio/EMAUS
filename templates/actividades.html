@@ -58,29 +58,22 @@
 <nav>
     <a href="{{ url_for('index') }}">Inventario</a>
     <a href="{{ url_for('actividades') }}">Actividades</a>
+    <a href="{{ url_for('areas') }}">Areas</a>
 </nav>
 
 <h2>Actividades</h2>
 
 <form action="{{ url_for('actualizar_actividades') }}" method="post">
     <div id="filtros-container" style="margin-bottom: 15px;">
-        
-        <!-- Filtro Día en su propia línea -->
-        <div style="margin-bottom: 10px; display: block;">
-            <label for="filtro-dia" style="display: block; margin-bottom: 5px;">Día:</label>
-            <select id="filtro-dia" style="display: block; width: 100%;">
-                <option value="">Todos los días</option>
-            </select>
-        </div>
-
-        <!-- Filtro Grupo Función en su propia línea -->
-        <div style="margin-bottom: 10px; display: block;">
-            <label for="filtro-grupo" style="display: block; margin-bottom: 5px;">Grupo Función:</label>
-            <select id="filtro-grupo" style="display: block; width: 100%;">
-                <option value="">Todos los grupos</option>
-            </select>
-        </div>
-        
+        <label for="filtro-dia">Día:</label>
+        <select id="filtro-dia">
+            <option value="">Todos los días</option>
+        </select>
+    
+        <label for="filtro-grupo" style="margin-left: 20px;">Grupo Función:</label>
+        <select id="filtro-grupo">
+            <option value="">Todos los grupos</option>
+        </select>
     </div>
 
     <table id="actividadesTabla" class="display">
