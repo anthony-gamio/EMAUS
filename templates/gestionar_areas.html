@@ -1,108 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <head>
-        <meta charset="UTF-8">
-        <title>Gestión de Áreas y Materiales</title>    
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Áreas y Materiales</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
         .section { margin-bottom: 30px; }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        nav {
-            background-color: #333;
-            overflow: hidden;
-        }
-        nav .right {
-            float: right;
-        }
-        nav a {
-            float: left;
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
-        }
-        nav a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-        .logo-img {
-        height: 60px;  /* Ajusta el tamaño del logo */
-        margin-right: 10px;  /* Espacio entre el logo y el texto */
-        vertical-align: middle;
-        }
-        h2 { margin-top: 20px; }
-        h1 {
-            color: #333;
-        }
-        form {
-            background: white;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        input {
-            margin-bottom: 10px;
-            padding: 8px;
-            width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            background: white;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
+        button { margin: 5px 0; padding: 5px 10px; cursor: pointer; }
+        input, select { padding: 5px; margin-top: 5px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <h1>Gestión de Áreas y Materiales</h1>
-<!-- Menú de Navegación -->
-<nav>
-    <a href="{{ url_for('index') }}">Inventario</a>
-    <a href="{{ url_for('actividades') }}">Actividades</a>
-    <a href="{{ url_for('areas') }}">Areas</a>
-</nav>
+    <h1>Gestión de Áreas, Materiales e Ítems</h1>
+
     <!-- SECCIÓN 1: ÁREAS -->
     <div class="section" id="seccion-areas">
         <h2>Áreas Responsables</h2>
@@ -137,13 +52,28 @@
         </table>
     </div>
 
-    <!-- SECCIÓN 2: MATERIALES (Se llenará dinámicamente) -->
-    <div class="section" id="seccion-materiales" style="display:none;">
+    <!-- SECCIÓN 2: MATERIALES (Se muestra al seleccionar un área) -->
+    <div class="section hidden" id="seccion-materiales">
         <h2>Materiales de <span id="nombre-area-seleccionada"></span></h2>
         <button onclick="volverAreas()">Volver a Áreas</button>
         
-        <!-- Aquí aparecerán los materiales dinámicamente -->
+        <!-- Formulario para agregar material -->
+        <form id="form-agregar-material">
+            <input type="text" id="nombre_material" placeholder="Nombre del Material" required>
+            <button type="submit">Agregar Material</button>
+        </form>
+
+        <!-- Lista de Materiales -->
         <div id="lista-materiales"></div>
+    </div>
+
+    <!-- SECCIÓN 3: ASIGNACIÓN DE ÍTEMS (Se muestra al seleccionar un material) -->
+    <div class="section hidden" id="seccion-asignacion">
+        <h2>Asignar Ítems a <span id="nombre-material-seleccionado"></span></h2>
+        <button onclick="volverMateriales()">Volver a Materiales</button>
+
+        <!-- Aquí se cargará el formulario de asignación dinámicamente -->
+        <div id="form-asignar-items"></div>
     </div>
 
 <script>
@@ -156,19 +86,52 @@
             const areaNombre = $(this).closest('tr').find('td:first').text();
 
             $('#nombre-area-seleccionada').text(areaNombre);
-            $('#seccion-areas').hide();
-            $('#seccion-materiales').show();
+            $('#seccion-areas').addClass('hidden');
+            $('#seccion-materiales').removeClass('hidden');
 
             // Llamada AJAX para obtener materiales
             $.get('/areas/' + areaId + '/materiales', function(data) {
                 $('#lista-materiales').html(data);
+
+                // Configurar el formulario para agregar materiales a esta área
+                $('#form-agregar-material').off('submit').on('submit', function(e) {
+                    e.preventDefault();
+                    const nombreMaterial = $('#nombre_material').val();
+
+                    $.post('/materiales/agregar/' + areaId, { nombre_material: nombreMaterial }, function() {
+                        // Recargar la lista de materiales después de agregar uno nuevo
+                        $.get('/areas/' + areaId + '/materiales', function(data) {
+                            $('#lista-materiales').html(data);
+                            $('#nombre_material').val('');
+                        });
+                    });
+                });
             });
         });
     });
 
+    // Volver a la lista de Áreas
     function volverAreas() {
-        $('#seccion-materiales').hide();
-        $('#seccion-areas').show();
+        $('#seccion-materiales').addClass('hidden');
+        $('#seccion-areas').removeClass('hidden');
+    }
+
+    // Volver a la lista de Materiales
+    function volverMateriales() {
+        $('#seccion-asignacion').addClass('hidden');
+        $('#seccion-materiales').removeClass('hidden');
+    }
+
+    // Mostrar la asignación de ítems al hacer clic en "Asignar Ítems"
+    function verAsignacionItems(materialId, materialNombre) {
+        $('#nombre-material-seleccionado').text(materialNombre);
+        $('#seccion-materiales').addClass('hidden');
+        $('#seccion-asignacion').removeClass('hidden');
+
+        // Llamada AJAX para cargar el formulario de asignación
+        $.get('/asignar_items/' + materialId, function(data) {
+            $('#form-asignar-items').html(data);
+        });
     }
 </script>
 

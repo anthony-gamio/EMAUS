@@ -59,7 +59,6 @@ class Inventario(db.Model):
     categoria = Column(String, nullable=False)
     consumo_estimado = Column(Integer, default=0)
 
-# Modelo para la Asignación de Ítems
 class AsignacionItem(db.Model):
     __tablename__ = 'asignacion_items'
     id = Column(Integer, primary_key=True)
@@ -67,7 +66,6 @@ class AsignacionItem(db.Model):
     item_id = Column(Integer, ForeignKey('inventario.id'), nullable=False)
     cantidad_asignada = Column(Integer, nullable=False)
     
-    # Relación para acceder al ítem del inventario directamente
     item = relationship('Inventario', backref='asignaciones')
 
 # Crear tablas si no existen
@@ -196,6 +194,70 @@ def eliminar_area(area_id):
     db.session.delete(area)
     db.session.commit()
     return redirect(url_for('areas'))
+
+@app.route('/areas/<int:area_id>/materiales')
+def ver_materiales(area_id):
+    area = Area.query.get_or_404(area_id)
+    materiales = Material.query.filter_by(area_id=area.id).all()
+    return render_template('materiales_partial.html', materiales=materiales, area=area)
+
+@app.route('/materiales/agregar/<int:area_id>', methods=['POST'])
+def agregar_material(area_id):
+    nombre_material = request.form.get('nombre_material')
+    if nombre_material:
+        nuevo_material = Material(nombre=nombre_material, area_id=area_id)
+        db.session.add(nuevo_material)
+        db.session.commit()
+    return redirect(url_for('ver_materiales', area_id=area_id))
+
+@app.route('/materiales/eliminar/<int:material_id>', methods=['POST'])
+def eliminar_material(material_id):
+    material = Material.query.get_or_404(material_id)
+    area_id = material.area_id
+    db.session.delete(material)
+    db.session.commit()
+    return redirect(url_for('ver_materiales', area_id=area_id))
+
+@app.route('/asignar_items/<int:material_id>')
+def ver_asignacion_items(material_id):
+    material = Material.query.get_or_404(material_id)
+    inventario = Inventario.query.all()  # Obtener todos los ítems del inventario
+    asignaciones = AsignacionItem.query.filter_by(material_id=material_id).all()
+    return render_template('asignar_items_partial.html', material=material, inventario=inventario, asignaciones=asignaciones)
+
+@app.route('/asignar_items/<int:material_id>', methods=['POST'])
+def asignar_items(material_id):
+    item_id = int(request.form.get('item_id'))
+    cantidad_asignada = int(request.form.get('cantidad_asignada'))
+    
+    # Verificar si ya existe una asignación previa para el mismo ítem y material
+    asignacion_existente = AsignacionItem.query.filter_by(material_id=material_id, item_id=item_id).first()
+
+    if asignacion_existente:
+        asignacion_existente.cantidad_asignada += cantidad_asignada  # Sumar la cantidad si ya existe
+    else:
+        nueva_asignacion = AsignacionItem(material_id=material_id, item_id=item_id, cantidad_asignada=cantidad_asignada)
+        db.session.add(nueva_asignacion)
+
+    # Actualizar el consumo estimado en el inventario
+    item_inventario = Inventario.query.get(item_id)
+    item_inventario.consumo_estimado += cantidad_asignada
+
+    db.session.commit()
+    return redirect(url_for('ver_asignacion_items', material_id=material_id))
+
+@app.route('/asignar_items/eliminar/<int:asignacion_id>', methods=['POST'])
+def eliminar_asignacion(asignacion_id):
+    asignacion = AsignacionItem.query.get_or_404(asignacion_id)
+
+    # Actualizar el consumo estimado en el inventario
+    item_inventario = Inventario.query.get(asignacion.item_id)
+    item_inventario.consumo_estimado -= asignacion.cantidad_asignada
+
+    db.session.delete(asignacion)
+    db.session.commit()
+    return redirect(url_for('ver_asignacion_items', material_id=asignacion.material_id))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
