@@ -34,20 +34,20 @@ class Item(Base):
     categoria = Column(String)
     consumo_estimado = Column(Integer)
 
-class Area(db.Model):
+class Area(Base):
     __tablename__ = 'areas'
     id = Column(Integer, primary_key=True)
     nombre = Column(String, nullable=False, unique=True)
     materiales = relationship('Material', backref='area', cascade="all, delete-orphan")
 
-class Material(db.Model):
+class Material(Base):
     __tablename__ = 'materiales'
     id = Column(Integer, primary_key=True)
     nombre = Column(String, nullable=False)
     area_id = Column(Integer, ForeignKey('areas.id'), nullable=False)
     asignaciones = relationship('AsignacionItem', backref='material', cascade="all, delete-orphan")
 
-class Inventario(db.Model):
+class Inventario(Base):
     __tablename__ = 'inventario'
     id = Column(Integer, primary_key=True)
     nombre = Column(String, nullable=False)
@@ -55,13 +55,12 @@ class Inventario(db.Model):
     categoria = Column(String, nullable=False)
     consumo_estimado = Column(Integer, default=0)
 
-class AsignacionItem(db.Model):
+class AsignacionItem(Base):
     __tablename__ = 'asignacion_items'
     id = Column(Integer, primary_key=True)
     material_id = Column(Integer, ForeignKey('materiales.id'), nullable=False)
     item_id = Column(Integer, ForeignKey('inventario.id'), nullable=False)
     cantidad_asignada = Column(Integer, nullable=False)
-    
     item = relationship('Inventario', backref='asignaciones')
 
 # Crear tablas si no existen
