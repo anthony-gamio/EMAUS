@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-from flask_sqlalchemy import SQLAlchemy
 import os
 import pandas as pd
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from urllib.parse import quote_plus
 
@@ -21,18 +21,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 # Definición del modelo
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String
-
 Base = declarative_base()
-
-class Item(Base):
-    __tablename__ = 'inventario'
-    id = Column(Integer, primary_key=True)
-    nombre = Column(String)
-    cantidad = Column(Integer)
-    categoria = Column(String)
-    consumo_estimado = Column(Integer)
 
 class Area(Base):
     __tablename__ = 'areas'
@@ -65,8 +54,6 @@ class AsignacionItem(Base):
 
 # Crear tablas si no existen
 Base.metadata.create_all(engine)
-with app.app_context():
-    db.create_all()
 
 # Función para vaciar la tabla inicial
 def reiniciar_tabla():
@@ -74,24 +61,22 @@ def reiniciar_tabla():
         session.query(AsignacionItem).delete()
         session.query(Inventario).delete()
         session.commit()
-        print("La tabla 'inventario' y 'asignacion_items' han sido vaciadas en el entorno local.")
+        print("Las tablas 'inventario' y 'asignacion_items' han sido vaciadas en el entorno local.")
     else:
         print("No se vacía la tabla en producción.")
 
-
 # Cargar CSV solo si la tabla está vacía
 def cargar_csv_inicial():
-    if session.query(Item).count() == 0:
-        # Asegúrate de que el archivo CSV esté en la misma carpeta o ajusta la ruta
-        csv_path = 'inventario.csv'  
+    if session.query(Inventario).count() == 0:
+        csv_path = 'inventario.csv'
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
             for _, row in df.iterrows():
-                item = Item(
+                item = Inventario(
                     nombre=row['nombre'],
                     cantidad=row['cantidad'],
                     categoria=row['categoria'],
-                    consumo_estimado=row.get('consumo_estimado', 0)  # Valor predeterminado si falta
+                    consumo_estimado=row.get('consumo_estimado', 0)
                 )
                 session.add(item)
             session.commit()
@@ -106,7 +91,7 @@ cargar_csv_inicial()
 
 @app.route('/')
 def index():
-    inventario = session.query(Item).all()
+    inventario = session.query(Inventario).all()
     return render_template('index.html', inventario=inventario)
 
 @app.route('/agregar', methods=['POST'])
@@ -115,18 +100,110 @@ def agregar():
     cantidad = int(request.form['cantidad'])
     categoria = request.form['categoria']
 
-    item_existente = session.query(Item).filter_by(nombre=nombre, categoria=categoria).first()
+    item_existente = session.query(Inventario).filter_by(nombre=nombre, categoria=categoria).first()
 
     if item_existente:
         item_existente.cantidad += cantidad
         session.commit()
-            
     else:
-        nuevo_item = Item(nombre=nombre, cantidad=cantidad, categoria=categoria)
+        nuevo_item = Inventario(nombre=nombre, cantidad=cantidad, categoria=categoria)
         session.add(nuevo_item)
         session.commit()
 
     return redirect(url_for('index'))
+
+@app.route('/areas')
+def areas():
+    todas_areas = session.query(Area).all()
+    return render_template('gestionar_areas.html', areas=todas_areas)
+
+@app.route('/areas/agregar', methods=['POST'])
+def agregar_area():
+    nombre_area = request.form.get('nombre_area')
+    if nombre_area:
+        nueva_area = Area(nombre=nombre_area)
+        session.add(nueva_area)
+        session.commit()
+    return redirect(url_for('areas'))
+
+@app.route('/areas/eliminar/<int:area_id>', methods=['POST'])
+def eliminar_area(area_id):
+    area = session.query(Area).get(area_id)
+    if not area:
+        return "Área no encontrada", 404
+    session.delete(area)
+    session.commit()
+    return redirect(url_for('areas'))
+
+@app.route('/areas/<int:area_id>/materiales')
+def ver_materiales(area_id):
+    area = session.query(Area).get(area_id)
+    if not area:
+        return "Área no encontrada", 404
+    materiales = session.query(Material).filter_by(area_id=area.id).all()
+    return render_template('materiales_partial.html', materiales=materiales, area=area)
+
+@app.route('/materiales/agregar/<int:area_id>', methods=['POST'])
+def agregar_material(area_id):
+    nombre_material = request.form.get('nombre_material')
+    if nombre_material:
+        nuevo_material = Material(nombre=nombre_material, area_id=area_id)
+        session.add(nuevo_material)
+        session.commit()
+    return redirect(url_for('ver_materiales', area_id=area_id))
+
+@app.route('/materiales/eliminar/<int:material_id>', methods=['POST'])
+def eliminar_material(material_id):
+    material = session.query(Material).get(material_id)
+    if not material:
+        return "Material no encontrado", 404
+    area_id = material.area_id
+    session.delete(material)
+    session.commit()
+    return redirect(url_for('ver_materiales', area_id=area_id))
+
+@app.route('/asignar_items/<int:material_id>')
+def ver_asignacion_items(material_id):
+    material = session.query(Material).get(material_id)
+    if not material:
+        return "Material no encontrado", 404
+    inventario = session.query(Inventario).all()
+    asignaciones = session.query(AsignacionItem).filter_by(material_id=material_id).all()
+    return render_template('asignar_items_partial.html', material=material, inventario=inventario, asignaciones=asignaciones)
+
+@app.route('/asignar_items/<int:material_id>', methods=['POST'])
+def asignar_items(material_id):
+    item_id = int(request.form.get('item_id'))
+    cantidad_asignada = int(request.form.get('cantidad_asignada'))
+
+    asignacion_existente = session.query(AsignacionItem).filter_by(material_id=material_id, item_id=item_id).first()
+
+    if asignacion_existente:
+        asignacion_existente.cantidad_asignada += cantidad_asignada
+    else:
+        nueva_asignacion = AsignacionItem(material_id=material_id, item_id=item_id, cantidad_asignada=cantidad_asignada)
+        session.add(nueva_asignacion)
+
+    item_inventario = session.query(Inventario).get(item_id)
+    if item_inventario:
+        item_inventario.consumo_estimado += cantidad_asignada
+
+    session.commit()
+    return redirect(url_for('ver_asignacion_items', material_id=material_id))
+
+@app.route('/asignar_items/eliminar/<int:asignacion_id>', methods=['POST'])
+def eliminar_asignacion(asignacion_id):
+    asignacion = session.query(AsignacionItem).get(asignacion_id)
+    if not asignacion:
+        return "Asignación no encontrada", 404
+
+    item_inventario = session.query(Inventario).get(asignacion.item_id)
+    if item_inventario:
+        item_inventario.consumo_estimado -= asignacion.cantidad_asignada
+
+    session.delete(asignacion)
+    session.commit()
+    return redirect(url_for('ver_asignacion_items', material_id=asignacion.material_id))
 
 @app.route('/actividades')
 def actividades():
@@ -134,26 +211,15 @@ def actividades():
     
     if os.path.exists(actividades_path):
         try:
-            # Intentar leer el CSV con codificación UTF-8
             df = pd.read_csv(actividades_path, encoding='utf-8')
-
-            # Asegurarse de que la columna 'Estado' es booleana
             df['Estado'] = df['Estado'].astype(bool)
             dias_ordenados = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
             df['Día'] = df['Día'].str.capitalize()
             df['Día'] = pd.Categorical(df['Día'], categories=dias_ordenados, ordered=True)
             df = df.sort_values('Día')
-
             actividades = df.to_dict(orient='records')
-
-        except pd.errors.ParserError as e:
-            # Si hay un error al leer el CSV, mostrar un mensaje claro en la página
-            return f"<h2>Error al leer el CSV de actividades:</h2><p>{e}</p>", 500
-
         except Exception as e:
-            # Capturar cualquier otro error inesperado
-            return f"<h2>Ocurrió un error inesperado:</h2><p>{e}</p>", 500
-
+            return f"<h2>Error al leer el CSV:</h2><p>{e}</p>", 500
     else:
         actividades = []
 
@@ -161,7 +227,7 @@ def actividades():
 
 @app.route('/actualizar_actividades', methods=['POST'])
 def actualizar_actividades():
-    actividades_path = ('actividades.csv')
+    actividades_path = 'actividades.csv'
     df = pd.read_csv(actividades_path, encoding='utf-8')
 
     # Actualizar el estado de 'Estado' según los checkboxes enviados
@@ -173,91 +239,6 @@ def actualizar_actividades():
     df.to_csv(actividades_path, index=False)
 
     return redirect(url_for('actividades'))
-
-@app.route('/areas')
-def areas():
-    todas_areas = Area.query.all()
-    return render_template('gestionar_areas.html', areas=todas_areas)
-
-@app.route('/areas/agregar', methods=['POST'])
-def agregar_area():
-    nombre_area = request.form.get('nombre_area')
-    if nombre_area:
-        nueva_area = Area(nombre=nombre_area)
-        db.session.add(nueva_area)
-        db.session.commit()
-    return redirect(url_for('areas'))
-
-@app.route('/areas/eliminar/<int:area_id>', methods=['POST'])
-def eliminar_area(area_id):
-    area = Area.query.get_or_404(area_id)
-    db.session.delete(area)
-    db.session.commit()
-    return redirect(url_for('areas'))
-
-@app.route('/areas/<int:area_id>/materiales')
-def ver_materiales(area_id):
-    area = Area.query.get_or_404(area_id)
-    materiales = Material.query.filter_by(area_id=area.id).all()
-    return render_template('materiales_partial.html', materiales=materiales, area=area)
-
-@app.route('/materiales/agregar/<int:area_id>', methods=['POST'])
-def agregar_material(area_id):
-    nombre_material = request.form.get('nombre_material')
-    if nombre_material:
-        nuevo_material = Material(nombre=nombre_material, area_id=area_id)
-        db.session.add(nuevo_material)
-        db.session.commit()
-    return redirect(url_for('ver_materiales', area_id=area_id))
-
-@app.route('/materiales/eliminar/<int:material_id>', methods=['POST'])
-def eliminar_material(material_id):
-    material = Material.query.get_or_404(material_id)
-    area_id = material.area_id
-    db.session.delete(material)
-    db.session.commit()
-    return redirect(url_for('ver_materiales', area_id=area_id))
-
-@app.route('/asignar_items/<int:material_id>')
-def ver_asignacion_items(material_id):
-    material = Material.query.get_or_404(material_id)
-    inventario = Inventario.query.all()  # Obtener todos los ítems del inventario
-    asignaciones = AsignacionItem.query.filter_by(material_id=material_id).all()
-    return render_template('asignar_items_partial.html', material=material, inventario=inventario, asignaciones=asignaciones)
-
-@app.route('/asignar_items/<int:material_id>', methods=['POST'])
-def asignar_items(material_id):
-    item_id = int(request.form.get('item_id'))
-    cantidad_asignada = int(request.form.get('cantidad_asignada'))
-    
-    # Verificar si ya existe una asignación previa para el mismo ítem y material
-    asignacion_existente = AsignacionItem.query.filter_by(material_id=material_id, item_id=item_id).first()
-
-    if asignacion_existente:
-        asignacion_existente.cantidad_asignada += cantidad_asignada  # Sumar la cantidad si ya existe
-    else:
-        nueva_asignacion = AsignacionItem(material_id=material_id, item_id=item_id, cantidad_asignada=cantidad_asignada)
-        db.session.add(nueva_asignacion)
-
-    # Actualizar el consumo estimado en el inventario
-    item_inventario = Inventario.query.get(item_id)
-    item_inventario.consumo_estimado += cantidad_asignada
-
-    db.session.commit()
-    return redirect(url_for('ver_asignacion_items', material_id=material_id))
-
-@app.route('/asignar_items/eliminar/<int:asignacion_id>', methods=['POST'])
-def eliminar_asignacion(asignacion_id):
-    asignacion = AsignacionItem.query.get_or_404(asignacion_id)
-
-    # Actualizar el consumo estimado en el inventario
-    item_inventario = Inventario.query.get(asignacion.item_id)
-    item_inventario.consumo_estimado -= asignacion.cantidad_asignada
-
-    db.session.delete(asignacion)
-    db.session.commit()
-    return redirect(url_for('ver_asignacion_items', material_id=asignacion.material_id))
-
 
 if __name__ == '__main__':
     app.run(debug=True)
