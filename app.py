@@ -20,15 +20,11 @@ engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=10, max_overf
 Session = sessionmaker(bind=engine)
 session = Session()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 # Definición del modelo
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 
 Base = declarative_base()
-db = SQLAlchemy(app)
 
 class Item(Base):
     __tablename__ = 'inventario'
