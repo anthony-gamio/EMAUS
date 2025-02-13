@@ -80,8 +80,12 @@ cargar_csv_inicial()
 
 @app.route('/')
 def index():
-    inventario = session.query(Inventario).all()
-    return render_template('index.html', inventario=inventario)
+    session = Session()  # Crear una nueva sesión
+    try:
+        inventario = session.query(Inventario).all()
+        return render_template('index.html', inventario=inventario)
+    finally:
+        session.close()  # Cerrar la sesión después de usarla
 
 @app.route('/agregar', methods=['POST'])
 def agregar():
