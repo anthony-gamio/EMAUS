@@ -25,6 +25,19 @@ session = Session()
 # Definición del modelo
 Base = declarative_base()
 
+class Area(Base):
+    __tablename__ = 'areas'
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String, nullable=False, unique=True)
+    materiales = relationship('Material', backref='area', cascade="all, delete-orphan")
+
+class Material(Base):
+    __tablename__ = 'materiales'
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String, nullable=False)
+    area_id = Column(Integer, ForeignKey('areas.id'), nullable=False)
+    asignaciones = relationship('AsignacionItem', backref='material', cascade="all, delete-orphan")
+
 class Inventario(Base):
     __tablename__ = 'inventario'
     id = Column(Integer, primary_key=True)
@@ -104,6 +117,134 @@ def agregar():
         session.commit()
 
     return redirect(url_for('index'))
+
+@app.route('/areas')
+def areas():
+    todas_areas = session.query(Area).all()
+    return render_template('gestionar_areas.html', areas=todas_areas)
+
+@app.route('/areas/agregar', methods=['POST'])
+def agregar_area():
+    nombre_area = request.form.get('nombre_area')
+    if nombre_area:
+        nueva_area = Area(nombre=nombre_area)
+        session.add(nueva_area)
+        session.commit()
+    return redirect(url_for('areas'))
+
+@app.route('/areas/eliminar/<int:area_id>', methods=['POST'])
+def eliminar_area(area_id):
+    area = session.query(Area).get(area_id)
+    if not area:
+        return "Área no encontrada", 404
+    session.delete(area)
+    session.commit()
+    return redirect(url_for('areas'))
+
+@app.route('/areas/<int:area_id>/materiales')
+def ver_materiales(area_id):
+    area = session.query(Area).get(area_id)
+    if not area:
+        return "Área no encontrada", 404
+    materiales = session.query(Material).filter_by(area_id=area.id).all()
+    return render_template('materiales_partial.html', materiales=materiales, area=area)
+
+@app.route('/materiales/agregar/<int:area_id>', methods=['POST'])
+def agregar_material(area_id):
+    nombre_material = request.form.get('nombre_material')
+    if nombre_material:
+        nuevo_material = Material(nombre=nombre_material, area_id=area_id)
+        session.add(nuevo_material)
+        session.commit()
+    return redirect(url_for('ver_materiales', area_id=area_id))
+
+@app.route('/materiales/eliminar/<int:material_id>', methods=['POST'])
+def eliminar_material(material_id):
+    material = session.query(Material).get(material_id)
+    if not material:
+        return "Material no encontrado", 404
+    area_id = material.area_id
+    session.delete(material)
+    session.commit()
+    return redirect(url_for('ver_materiales', area_id=area_id))
+
+@app.route('/asignar_items/<int:material_id>')
+def ver_asignacion_items(material_id):
+    material = session.query(Material).get(material_id)
+    if not material:
+        return "Material no encontrado", 404
+    inventario = session.query(Inventario).all()
+    asignaciones = session.query(AsignacionItem).filter_by(material_id=material_id).all()
+    return render_template('asignar_items_partial.html', material=material, inventario=inventario, asignaciones=asignaciones)
+
+@app.route('/asignar_items/<int:material_id>', methods=['POST'])
+def asignar_items(material_id):
+    item_id = int(request.form.get('item_id'))
+    cantidad_asignada = int(request.form.get('cantidad_asignada'))
+
+    asignacion_existente = session.query(AsignacionItem).filter_by(material_id=material_id, item_id=item_id).first()
+
+    if asignacion_existente:
+        asignacion_existente.cantidad_asignada += cantidad_asignada
+    else:
+        nueva_asignacion = AsignacionItem(material_id=material_id, item_id=item_id, cantidad_asignada=cantidad_asignada)
+        session.add(nueva_asignacion)
+
+    item_inventario = session.query(Inventario).get(item_id)
+    if item_inventario:
+        item_inventario.consumo_estimado += cantidad_asignada
+
+    session.commit()
+    return redirect(url_for('ver_asignacion_items', material_id=material_id))
+
+@app.route('/asignar_items/eliminar/<int:asignacion_id>', methods=['POST'])
+def eliminar_asignacion(asignacion_id):
+    asignacion = session.query(AsignacionItem).get(asignacion_id)
+    if not asignacion:
+        return "Asignación no encontrada", 404
+
+    item_inventario = session.query(Inventario).get(asignacion.item_id)
+    if item_inventario:
+        item_inventario.consumo_estimado -= asignacion.cantidad_asignada
+
+    session.delete(asignacion)
+    session.commit()
+    return redirect(url_for('ver_asignacion_items', material_id=asignacion.material_id))
+
+@app.route('/actividades')
+def actividades():
+    actividades_path = 'actividades.csv'
+    
+    if os.path.exists(actividades_path):
+        try:
+            df = pd.read_csv(actividades_path, encoding='utf-8')
+            df['Estado'] = df['Estado'].astype(bool)
+            dias_ordenados = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+            df['Día'] = df['Día'].str.capitalize()
+            df['Día'] = pd.Categorical(df['Día'], categories=dias_ordenados, ordered=True)
+            df = df.sort_values('Día')
+            actividades = df.to_dict(orient='records')
+        except Exception as e:
+            return f"<h2>Error al leer el CSV:</h2><p>{e}</p>", 500
+    else:
+        actividades = []
+
+    return render_template('actividades.html', actividades=actividades)
+
+@app.route('/actualizar_actividades', methods=['POST'])
+def actualizar_actividades():
+    actividades_path = 'actividades.csv'
+    df = pd.read_csv(actividades_path, encoding='utf-8')
+
+    # Actualizar el estado de 'Estado' según los checkboxes enviados
+    for i in range(len(df)):
+        checkbox_name = f'completado_{i}'
+        df.at[i, 'Estado'] = checkbox_name in request.form  # True si está marcado, False si no
+
+    # Guardar los cambios en el CSV
+    df.to_csv(actividades_path, index=False)
+
+    return redirect(url_for('actividades'))
 
 if __name__ == '__main__':
     app.run(debug=True)
