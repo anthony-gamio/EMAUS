@@ -121,8 +121,12 @@ def agregar():
 
 @app.route('/areas')
 def areas():
-    todas_areas = session.query(Area).all()
-    return render_template('gestionar_areas.html', areas=todas_areas)
+    session = Session()
+    try:
+        todas_areas = session.query(Area).all()
+        return render_template('gestionar_areas.html', areas=todas_areas)
+    finally:
+        session.close()
 
 @app.route('/areas/agregar', methods=['POST'])
 def agregar_area():
