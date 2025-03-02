@@ -130,21 +130,29 @@ def areas():
 
 @app.route('/areas/agregar', methods=['POST'])
 def agregar_area():
-    nombre_area = request.form.get('nombre_area')
-    if nombre_area:
-        nueva_area = Area(nombre=nombre_area)
-        session.add(nueva_area)
-        session.commit()
-    return redirect(url_for('areas'))
+    session = Session()
+    try:
+        nombre_area = request.form.get('nombre_area')
+        if nombre_area:
+            nueva_area = Area(nombre=nombre_area)
+            session.add(nueva_area)
+            session.commit()
+        return redirect(url_for('areas'))
+    finally:
+        session.close()
 
 @app.route('/areas/eliminar/<int:area_id>', methods=['POST'])
 def eliminar_area(area_id):
-    area = session.query(Area).get(area_id)
-    if not area:
-        return "Área no encontrada", 404
-    session.delete(area)
-    session.commit()
-    return redirect(url_for('areas'))
+    session = Session()
+    try:
+        area = session.query(Area).get(area_id)
+        if not area:
+            return "Área no encontrada", 404
+        session.delete(area)
+        session.commit()
+        return redirect(url_for('areas'))
+    finally:
+        session.close()
 
 @app.route('/areas/<int:area_id>/materiales')
 def ver_materiales(area_id):
