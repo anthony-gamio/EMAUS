@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from urllib.parse import quote_plus
+import psycopg2
 
 app = Flask(__name__)
 
