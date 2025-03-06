@@ -164,12 +164,16 @@ def ver_materiales(area_id):
 
 @app.route('/materiales/agregar/<int:area_id>', methods=['POST'])
 def agregar_material(area_id):
-    nombre_material = request.form.get('nombre_material')
-    if nombre_material:
-        nuevo_material = Material(nombre=nombre_material, area_id=area_id)
-        session.add(nuevo_material)
-        session.commit()
-    return redirect(url_for('ver_materiales', area_id=area_id))
+    session = Session()
+    try:
+        nombre_material = request.form.get('nombre_material')
+        if nombre_material:
+            nuevo_material = Material(nombre=nombre_material, area_id=area_id)
+            session.add(nuevo_material)
+            session.commit()
+        return redirect(url_for('ver_materiales', area_id=area_id))
+    finally:
+        session.close()
 
 @app.route('/materiales/eliminar/<int:material_id>', methods=['POST'])
 def eliminar_material(material_id):
