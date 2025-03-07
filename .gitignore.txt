@@ -1,0 +1,18 @@
+*.ini
+d e s k t o p . i n i 
+
+# Ignorar archivos generados por Windows
+desktop.ini
+
+# Ignorar archivos temporales de sistema
+Thumbs.db
+.DS_Store
+
+# Ignorar archivos de entorno virtual de Python
+venv/
+*.pyc
+__pycache__/
+
+# Ignorar archivos de configuración específicos del IDE
+.vscode/
+.idea/
