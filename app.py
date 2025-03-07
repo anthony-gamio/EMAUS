@@ -156,34 +156,51 @@ def eliminar_area(area_id):
 
 @app.route('/areas/<int:area_id>/materiales')
 def ver_materiales(area_id):
-    area = session.query(Area).get(area_id)
-    if not area:
-        return "Área no encontrada", 404
-    materiales = session.query(Material).filter_by(area_id=area.id).all()
-    return render_template('materiales_partial.html', materiales=materiales, area=area)
+    session = Session()
+    try:
+        area = session.query(Area).get(area_id)
+        if not area:
+            return "Área no encontrada", 404
+        materiales = session.query(Material).filter_by(area_id=area.id).all()
+        return render_template('materiales_partial.html', materiales=materiales, area=area)
+    finally:
+        session.close()
+
 
 @app.route('/materiales/agregar/<int:area_id>', methods=['POST'])
 def agregar_material(area_id):
     session = Session()
     try:
         nombre_material = request.form.get('nombre_material')
-        if nombre_material:
-            nuevo_material = Material(nombre=nombre_material, area_id=area_id)
-            session.add(nuevo_material)
-            session.commit()
+        print(f"Recibido: {nombre_material}")
+
+        if not nombre_material:
+            return "Error: No se recibió el nombre del material", 400
+
+        nuevo_material = Material(nombre=nombre_material, area_id=area_id)
+        session.add(nuevo_material)
+        session.commit()
+        print("Material agregado correctamente")
+        return "Material agregado", 200
+    finally:
+        session.close()
+
+
+@app.route('/materiales/eliminar/<int:material_id>', methods=['POST'])
+def eliminar_material(material_id):
+    session = Session()
+    try:
+        material = session.query(Material).get(material_id)
+        if not material:
+            return "Material no encontrado", 404
+        area_id = material.area_id
+        session.delete(material)
+        session.commit()
+        print(f"Material {material_id} eliminado correctamente")
         return redirect(url_for('ver_materiales', area_id=area_id))
     finally:
         session.close()
 
-@app.route('/materiales/eliminar/<int:material_id>', methods=['POST'])
-def eliminar_material(material_id):
-    material = session.query(Material).get(material_id)
-    if not material:
-        return "Material no encontrado", 404
-    area_id = material.area_id
-    session.delete(material)
-    session.commit()
-    return redirect(url_for('ver_materiales', area_id=area_id))
 
 @app.route('/asignar_items/<int:material_id>')
 def ver_asignacion_items(material_id):
@@ -193,6 +210,7 @@ def ver_asignacion_items(material_id):
     inventario = session.query(Inventario).all()
     asignaciones = session.query(AsignacionItem).filter_by(material_id=material_id).all()
     return render_template('asignar_items_partial.html', material=material, inventario=inventario, asignaciones=asignaciones)
+
 
 @app.route('/asignar_items/<int:material_id>', methods=['POST'])
 def asignar_items(material_id):

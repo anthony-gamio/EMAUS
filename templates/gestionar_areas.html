@@ -77,6 +77,7 @@
         <!-- Formulario para agregar material -->
         <form id="form-agregar-material">
             <input type="text" id="nombre_material" placeholder="Nombre del Material" required>
+            <input type="hidden" id="area_id">
             <button type="submit">Agregar Material</button>
         </form>
 
@@ -103,54 +104,101 @@
             const areaNombre = $(this).closest('tr').find('td:first').text();
 
             $('#nombre-area-seleccionada').text(areaNombre);
+            $('#area_id').val(areaId); 
             $('#seccion-areas').addClass('hidden');
             $('#seccion-materiales').removeClass('hidden');
 
-            // Llamada AJAX para obtener materiales
+            cargarMateriales(areaId);
+        });
+
+        // Cargar materiales de un área
+        function cargarMateriales(areaId) {
             $.get('/areas/' + areaId + '/materiales', function(data) {
                 $('#lista-materiales').html(data);
-
-                // Configurar el formulario para agregar materiales a esta área
-                $('#form-agregar-material').off('submit').on('submit', function(e) {
-                    e.preventDefault();
-                    const nombreMaterial = $('#nombre_material').val();
-
-                    $.post('/materiales/agregar/' + areaId, { nombre_material: nombreMaterial }, function() {
-                        // Recargar la lista de materiales después de agregar uno nuevo
-                        $.get('/areas/' + areaId + '/materiales', function(data) {
-                            $('#lista-materiales').html(data);
-                            $('#nombre_material').val('');
-                        });
-                    });
-                });
+                asignarEventosEliminar(); // Reasignar eventos después de actualizar la lista
             });
+        }
+
+        // Agregar materiales
+        $(document).on('submit', '#form-agregar-material', function(e) {
+            e.preventDefault();
+
+            const nombreMaterial = $('#nombre_material').val().trim();
+            const areaId = $('#area_id').val();
+
+            if (!nombreMaterial) {
+                alert("El nombre del material no puede estar vacío");
+                return;
+            }
+
+            if (!areaId) {
+                alert("Error: No se pudo identificar el área seleccionada.");
+                return;
+            }
+
+            $.post(`/materiales/agregar/${areaId}`, { nombre_material: nombreMaterial })
+                .done(function() {
+                    console.log("Material agregado correctamente");
+                    cargarMateriales(areaId); // Recargar la lista de materiales
+                    $('#nombre_material').val(''); // Limpiar el campo de entrada
+                })
+                .fail(function(xhr, status, error) {
+                    alert("Error al agregar el material: " + error);
+                    console.error(xhr.responseText);
+                });
         });
+
+        // Eliminar materiales (esta función se llama después de cargar materiales)
+        function asignarEventosEliminar() {
+            $('.btn-eliminar-material').off('click').on('click', function() {
+                const materialId = $(this).data('material-id');
+                const areaId = $('#area_id').val();
+
+                if (!confirm('¿Estás seguro de eliminar este material?')) {
+                    return;
+                }
+
+                $.post(`/materiales/eliminar/${materialId}`)
+                    .done(function() {
+                        console.log("Material eliminado correctamente");
+                        cargarMateriales(areaId); // Recargar la lista después de eliminar
+                    })
+                    .fail(function(xhr, status, error) {
+                        alert("Error al eliminar el material: " + error);
+                        console.error(xhr.responseText);
+                    });
+            });
+        }
     });
 
+    
     // Volver a la lista de Áreas
     function volverAreas() {
         $('#seccion-materiales').addClass('hidden');
         $('#seccion-areas').removeClass('hidden');
     }
-
+    
     // Volver a la lista de Materiales
     function volverMateriales() {
         $('#seccion-asignacion').addClass('hidden');
         $('#seccion-materiales').removeClass('hidden');
     }
-
+    
     // Mostrar la asignación de ítems al hacer clic en "Asignar Ítems"
     function verAsignacionItems(materialId, materialNombre) {
         $('#nombre-material-seleccionado').text(materialNombre);
         $('#seccion-materiales').addClass('hidden');
         $('#seccion-asignacion').removeClass('hidden');
-
+    
         // Llamada AJAX para cargar el formulario de asignación
         $.get('/asignar_items/' + materialId, function(data) {
             $('#form-asignar-items').html(data);
         });
     }
 </script>
+    
+
+
 
 </body>
 </html>
