@@ -33,6 +33,7 @@
         <a href="{{ url_for('index') }}">Inventario</a>
         <a href="{{ url_for('actividades') }}">Actividades</a>
         <a href="{{ url_for('areas') }}">Areas</a>
+        <a href="{{ url_for('requerimientos') }}">Requerimientos</a>
     </nav>
     
     <!-- SECCIÓN 1: ÁREAS -->
@@ -148,6 +149,23 @@
                 });
         });
 
+        // Mostrar formulario de asignación de ítems
+        // Mostrar formulario de asignación de ítems (handler delegado)
+        $(document).on('click', '.btn-asignar-items', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const materialId = $(this).data('material-id');
+            const materialNombre = $(this).data('material-nombre');
+
+            console.log('[CLICK] btn-asignar-items', { materialId, materialNombre });
+
+            verAsignacionItems(materialId, materialNombre);
+        });
+
+
+        
+        
         // Eliminar materiales (esta función se llama después de cargar materiales)
         function asignarEventosEliminar() {
             $('.btn-eliminar-material').off('click').on('click', function() {

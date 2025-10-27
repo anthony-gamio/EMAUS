@@ -92,12 +92,48 @@ def cargar_csv_inicial():
 # Llamar a la función al iniciar la aplicación
 cargar_csv_inicial()
 
+def _semaforo(stock: int, estimado: int) -> str:
+    if stock >= estimado:
+        return "VERDE"
+    if stock > 0 and stock < estimado:
+        return "AMARILLO"
+    return "ROJO"
+
+@app.route('/requerimientos')
+def requerimientos():
+    s = Session()
+    try:
+        reqs = []
+        items = s.query(Inventario).all()
+        for it in items:
+            estimado = it.consumo_estimado or 0
+            stock = it.cantidad or 0
+            faltante = max(0, estimado - stock)
+            color = _semaforo(stock, estimado)
+            if estimado > 0 or faltante > 0:
+                reqs.append({
+                    "id": it.id,
+                    "nombre": it.nombre,
+                    "categoria": it.categoria,
+                    "stock": stock,
+                    "estimado": estimado,
+                    "faltante": faltante,
+                    "semaforo": color
+                })
+        # Orden útil: ROJO > AMARILLO > VERDE, y dentro por faltante desc
+        prioridad = {"ROJO": 0, "AMARILLO": 1, "VERDE": 2}
+        reqs.sort(key=lambda r: (prioridad[r["semaforo"]], -r["faltante"]))
+        return render_template('requerimientos.html', requerimientos=reqs)
+    finally:
+        s.close()
+
+
 @app.route('/')
 def index():
     session = Session()  # Crear una nueva sesión
     try:
         inventario = session.query(Inventario).all()
-        return render_template('index.html', inventario=inventario)
+        return render_template('index.html', inventario=inventario, modo_admin=False)
     finally:
         session.close()  # Cerrar la sesión después de usarla
 
@@ -118,6 +154,24 @@ def agregar():
         session.commit()
 
     return redirect(url_for('index'))
+
+@app.route('/inventario/eliminar/<int:item_id>', methods=['POST'])
+def eliminar_item_inventario(item_id):
+    s = Session()
+    try:
+        item = s.get(Inventario, item_id)
+        if not item:
+            return "Ítem no encontrado", 404
+
+        # Eliminar asignaciones relacionadas a este ítem (evita FK rotas)
+        s.query(AsignacionItem).filter_by(item_id=item_id).delete()
+
+        # Eliminar el ítem de inventario
+        s.delete(item)
+        s.commit()
+        return redirect(url_for('index'))
+    finally:
+        s.close()
 
 @app.route('/areas')
 def areas():

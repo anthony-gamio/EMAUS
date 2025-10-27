@@ -109,6 +109,7 @@
     <a href="{{ url_for('index') }}">Inventario</a>
     <a href="{{ url_for('actividades') }}">Actividades</a>
     <a href="{{ url_for('areas') }}">Areas</a>
+    <a href="{{ url_for('requerimientos') }}">Requerimientos</a>
 </nav>
 
 <!-- Contenido de la página -->
@@ -136,6 +137,7 @@
                 <th>Cantidad</th>
                 <th>Categoría</th>
                 <th>Consumo Estimado</th>
+                {% if modo_admin %}<th>Acciones</th>{% endif %}
             </tr>
         </thead>
         <tbody>
@@ -145,6 +147,17 @@
                 <td>{{ item.cantidad }}</td>
                 <td>{{ item.categoria }}</td>
                 <td>{{ item.consumo_estimado }}</td>
+                {% if modo_admin %}
+                <td>
+                <form action="{{ url_for('eliminar_item_inventario', item_id=item.id) }}"
+                        method="post" style="display:inline;">
+                    <button type="submit"
+                            onclick="return confirm('¿Eliminar \"{{ item.nombre }}\"? Esta acción no se puede deshacer.');">
+                    Eliminar
+                    </button>
+                </form>
+                </td>
+                {% endif %}
               </tr>
              {% endfor %}
         </tbody>
