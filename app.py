@@ -23,6 +23,19 @@ engine = create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=10, max_overf
 Session = sessionmaker(bind=engine)
 session = Session()
 
+@app.teardown_request
+def _teardown_request(exc):
+    try:
+        if exc:
+            session.rollback()   # deshace si hubo error
+    except Exception:
+        pass
+    try:
+        session.close()          # libera siempre la conexión
+    except Exception:
+        pass
+
+
 # Definición del modelo
 Base = declarative_base()
 
@@ -268,23 +281,29 @@ def ver_asignacion_items(material_id):
 
 @app.route('/asignar_items/<int:material_id>', methods=['POST'])
 def asignar_items(material_id):
-    item_id = int(request.form.get('item_id'))
-    cantidad_asignada = int(request.form.get('cantidad_asignada'))
+    try:
+        item_id = int(request.form.get('item_id'))
+        cantidad_asignada = int(request.form.get('cantidad_asignada'))
 
-    asignacion_existente = session.query(AsignacionItem).filter_by(material_id=material_id, item_id=item_id).first()
+        asignacion_existente = session.query(AsignacionItem).filter_by(
+            material_id=material_id, item_id=item_id).first()
 
-    if asignacion_existente:
-        asignacion_existente.cantidad_asignada += cantidad_asignada
-    else:
-        nueva_asignacion = AsignacionItem(material_id=material_id, item_id=item_id, cantidad_asignada=cantidad_asignada)
-        session.add(nueva_asignacion)
+        if asignacion_existente:
+            asignacion_existente.cantidad_asignada += cantidad_asignada
+        else:
+            session.add(AsignacionItem(material_id=material_id,
+                                       item_id=item_id,
+                                       cantidad_asignada=cantidad_asignada))
 
-    item_inventario = session.query(Inventario).get(item_id)
-    if item_inventario:
-        item_inventario.consumo_estimado += cantidad_asignada
+        item_inventario = session.query(Inventario).get(item_id)
+        if item_inventario:
+            item_inventario.consumo_estimado += cantidad_asignada  # si esa columna existe
 
-    session.commit()
-    return redirect(url_for('ver_asignacion_items', material_id=material_id))
+        session.commit()
+        return redirect(url_for('ver_asignacion_items', material_id=material_id))
+    except Exception:
+        session.rollback()   # <— clave
+        raise
 
 @app.route('/asignar_items/eliminar/<int:asignacion_id>', methods=['POST'])
 def eliminar_asignacion(asignacion_id):
